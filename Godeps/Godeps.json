@@ -4,6 +4,10 @@
 	"GodepVersion": "v65",
 	"Deps": [
 		{
+			"ImportPath": "github.com/golang/protobuf/proto",
+			"Rev": "e51d002c610dbe8c136679a67a6ded5df4d49b5c"
+		},
+		{
 			"ImportPath": "github.com/onsi/ginkgo",
 			"Comment": "v1.2.0-55-g5437a97",
 			"Rev": "5437a97bf824dec14e58d68c56ee36e772670c2e"
@@ -137,6 +141,66 @@
 			"ImportPath": "github.com/onsi/gomega/types",
 			"Comment": "v1.0-92-g815512b",
 			"Rev": "815512bce8c889153a13104c9d9b2416153c1e02"
+		},
+		{
+			"ImportPath": "golang.org/x/net/context",
+			"Rev": "0c607074acd38c5f23d1344dfe74c977464d1257"
+		},
+		{
+			"ImportPath": "golang.org/x/net/http2",
+			"Rev": "0c607074acd38c5f23d1344dfe74c977464d1257"
+		},
+		{
+			"ImportPath": "golang.org/x/net/http2/hpack",
+			"Rev": "0c607074acd38c5f23d1344dfe74c977464d1257"
+		},
+		{
+			"ImportPath": "golang.org/x/net/internal/timeseries",
+			"Rev": "0c607074acd38c5f23d1344dfe74c977464d1257"
+		},
+		{
+			"ImportPath": "golang.org/x/net/lex/httplex",
+			"Rev": "0c607074acd38c5f23d1344dfe74c977464d1257"
+		},
+		{
+			"ImportPath": "golang.org/x/net/trace",
+			"Rev": "0c607074acd38c5f23d1344dfe74c977464d1257"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc",
+			"Rev": "b0b7afa173ab8030774fdf383cac027c3c5077d2"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc/codes",
+			"Rev": "b0b7afa173ab8030774fdf383cac027c3c5077d2"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc/credentials",
+			"Rev": "b0b7afa173ab8030774fdf383cac027c3c5077d2"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc/grpclog",
+			"Rev": "b0b7afa173ab8030774fdf383cac027c3c5077d2"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc/internal",
+			"Rev": "b0b7afa173ab8030774fdf383cac027c3c5077d2"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc/metadata",
+			"Rev": "b0b7afa173ab8030774fdf383cac027c3c5077d2"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc/naming",
+			"Rev": "b0b7afa173ab8030774fdf383cac027c3c5077d2"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc/peer",
+			"Rev": "b0b7afa173ab8030774fdf383cac027c3c5077d2"
+		},
+		{
+			"ImportPath": "google.golang.org/grpc/transport",
+			"Rev": "b0b7afa173ab8030774fdf383cac027c3c5077d2"
 		},
 		{
 			"ImportPath": "gopkg.in/yaml.v2",
