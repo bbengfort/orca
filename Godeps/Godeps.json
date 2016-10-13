@@ -137,6 +137,10 @@
 			"ImportPath": "github.com/onsi/gomega/types",
 			"Comment": "v1.0-92-g815512b",
 			"Rev": "815512bce8c889153a13104c9d9b2416153c1e02"
+		},
+		{
+			"ImportPath": "gopkg.in/yaml.v2",
+			"Rev": "a5b47d31c556af34a302ce5d659e6fea44d90de0"
 		}
 	]
 }

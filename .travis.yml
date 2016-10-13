@@ -12,10 +12,10 @@ install:
     - go get github.com/mattn/goveralls
     - godep restore
 
-script: ginkgo -r -v -coverpkg=github.com/bbengfort/mora
+script: ginkgo -r -v -coverpkg=github.com/bbengfort/orca
 
 after_script:
-    - goveralls -coverprofile=mora.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
+    - goveralls -coverprofile=orca.coverprofile -service=travis-ci -repotoken $COVERALLS_TOKEN
 
 env:
     global:

@@ -4,7 +4,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/bbengfort/orca"
@@ -41,11 +40,27 @@ func main() {
 }
 
 func startReflector(c *cli.Context) error {
-	fmt.Println("beginning reflector: ", c.Args().First())
+	app, err := orca.Init()
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+
+	if err = app.Reflect(); err != nil {
+		return cli.NewExitError(err.Error(), 2)
+	}
+
 	return nil
 }
 
 func startGenerator(c *cli.Context) error {
-	fmt.Println("beginning generator: ", c.Args().First())
+	app, err := orca.Init()
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+
+	if err = app.Generate(); err != nil {
+		return cli.NewExitError(err.Error(), 2)
+	}
+
 	return nil
 }
