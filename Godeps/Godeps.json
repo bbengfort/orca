@@ -8,6 +8,11 @@
 			"Rev": "e51d002c610dbe8c136679a67a6ded5df4d49b5c"
 		},
 		{
+			"ImportPath": "github.com/mattn/go-sqlite3",
+			"Comment": "v1.1.0-96-ge5a3c16",
+			"Rev": "e5a3c16c5c1d80b24f633e68aecd6b0702786d3d"
+		},
+		{
 			"ImportPath": "github.com/onsi/ginkgo",
 			"Comment": "v1.2.0-55-g5437a97",
 			"Rev": "5437a97bf824dec14e58d68c56ee36e772670c2e"
