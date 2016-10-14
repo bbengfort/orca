@@ -1,0 +1,27 @@
+# This is an example configuration for the Orca App
+# Modify to your local settings, rename and place in one of the following:
+#
+#   - /etc/orca.yml
+#   - ~/.orca/config.yml
+#   - $(pwd)/orca.yml
+#
+# Note it is preferable to store everything in the ~/.orca folder.
+
+# If debug is true, then command line output will be printed
+debug: true
+
+# The name of the local device
+name: null
+
+# The IP address of the local device. Reflectors listen on this address,
+# generators send pings to this device. Note this must be a well formed IP
+# address with a port, optionally; and will be resolved as follows:
+#   192.168.1.1:0 --> 192.168.1.1:3265
+#   null --> autoip:3265
+#   :4444 --> autoip:4444
+# where autoip automatically detects the external ip address of the machine
+# and the default port of the app is 3265.
+addr: :3265
+
+# The domain name of the advice
+domain: null

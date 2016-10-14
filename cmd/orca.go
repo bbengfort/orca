@@ -4,12 +4,15 @@
 package main
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/bbengfort/orca"
 	"github.com/joho/godotenv"
 	"github.com/urfave/cli"
 )
+
+var orcaApp *orca.App
 
 func main() {
 
@@ -23,6 +26,13 @@ func main() {
 	app.Version = orca.Version
 	app.Author = "Benjamin Bengfort"
 	app.Email = "bengfort@cs.umd.edu"
+	app.Flags = []cli.Flag{
+		cli.StringFlag{
+			Name:  "c, config",
+			Usage: "specify the path to a yaml configuration",
+		},
+	}
+	app.Before = initOrca
 	app.Commands = []cli.Command{
 		{
 			Name:   "reflect",
@@ -34,18 +44,39 @@ func main() {
 			Usage:  "run the generator daemon",
 			Action: startGenerator,
 		},
+		{
+			Name:   "config",
+			Usage:  "print the configuration and exit",
+			Action: printConfig,
+		},
 	}
 
 	app.Run(os.Args)
 }
 
-func startReflector(c *cli.Context) error {
-	app, err := orca.Init()
-	if err != nil {
+func initOrca(c *cli.Context) error {
+	var err error
+
+	// Initialize the application
+	if orcaApp, err = orca.Init(); err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
 
-	if err = app.Reflect(); err != nil {
+	// Modify the config from the command line if necessary
+	if c.String("config") != "" {
+		path := c.String("config")
+		if err = orcaApp.Config.Read(path); err != nil {
+			msg := fmt.Sprintf("Unable to read configuration at %s", path)
+			return cli.NewExitError(msg, 2)
+		}
+	}
+
+	return nil
+}
+
+func startReflector(c *cli.Context) error {
+
+	if err := orcaApp.Reflect(); err != nil {
 		return cli.NewExitError(err.Error(), 2)
 	}
 
@@ -53,14 +84,29 @@ func startReflector(c *cli.Context) error {
 }
 
 func startGenerator(c *cli.Context) error {
-	app, err := orca.Init()
+	addr, err := orca.ResolveAddr("")
+	device := &orca.Device{
+		Name:   "apollo",
+		IPAddr: addr,
+	}
+
+	reply, err := orca.Ping(device)
 	if err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
 
-	if err = app.Generate(); err != nil {
-		return cli.NewExitError(err.Error(), 2)
-	}
+	fmt.Println(reply)
+	return nil
 
+	// if err := orcaApp.Generate(); err != nil {
+	// 	return cli.NewExitError(err.Error(), 2)
+	// }
+	//
+	// return nil
+}
+
+func printConfig(c *cli.Context) error {
+	// Print the configuration and exit
+	fmt.Println(orcaApp.Config.String())
 	return nil
 }

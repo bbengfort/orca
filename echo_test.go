@@ -1,9 +1,9 @@
-package echo_test
+package orca_test
 
 import (
 	"time"
 
-	. "github.com/bbengfort/orca/echo"
+	. "github.com/bbengfort/orca"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

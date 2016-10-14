@@ -3,7 +3,7 @@
 // DO NOT EDIT!
 
 /*
-Package echo is a generated protocol buffer package.
+Package orca is a generated protocol buffer package.
 
 It is generated from these files:
 	echo.proto
@@ -15,7 +15,7 @@ It has these top-level messages:
 	EchoRequest
 	EchoReply
 */
-package echo
+package orca
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
@@ -43,14 +43,21 @@ type Time struct {
 	Nanoseconds int64 `protobuf:"varint,2,opt,name=nanoseconds" json:"nanoseconds,omitempty"`
 }
 
-func (m *Time) Reset()                    { *m = Time{} }
-func (m *Time) String() string            { return proto.CompactTextString(m) }
-func (*Time) ProtoMessage()               {}
+// Reset the message
+func (m *Time) Reset() { *m = Time{} }
+
+// String returns a string representation of the message
+func (m *Time) String() string { return proto.CompactTextString(m) }
+
+// ProtoMessage is a generated method
+func (*Time) ProtoMessage() {}
+
+// Descriptor is a generated method
 func (*Time) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{0} }
 
 // Location describes the results of an GeoIP query
 type Location struct {
-	Ipaddr       string  `protobuf:"bytes,1,opt,name=ipaddr" json:"ipaddr,omitempty"`
+	IPAddr       string  `protobuf:"bytes,1,opt,name=ipaddr" json:"ipaddr,omitempty"`
 	Latitude     float64 `protobuf:"fixed64,2,opt,name=latitude" json:"latitude,omitempty"`
 	Longitude    float64 `protobuf:"fixed64,3,opt,name=longitude" json:"longitude,omitempty"`
 	City         string  `protobuf:"bytes,4,opt,name=city" json:"city,omitempty"`
@@ -60,24 +67,39 @@ type Location struct {
 	Domain       string  `protobuf:"bytes,8,opt,name=domain" json:"domain,omitempty"`
 }
 
-func (m *Location) Reset()                    { *m = Location{} }
-func (m *Location) String() string            { return proto.CompactTextString(m) }
-func (*Location) ProtoMessage()               {}
+// Reset the message
+func (m *Location) Reset() { *m = Location{} }
+
+// String returns a string representation of the message
+func (m *Location) String() string { return proto.CompactTextString(m) }
+
+// ProtoMessage is a generated method
+func (*Location) ProtoMessage() {}
+
+// Descriptor is a generated method
 func (*Location) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{1} }
 
 // Device describes an sender or a receiver on the network.
 type Device struct {
 	Name     string    `protobuf:"bytes,1,opt,name=name" json:"name,omitempty"`
-	Ipaddr   string    `protobuf:"bytes,2,opt,name=ipaddr" json:"ipaddr,omitempty"`
+	IPAddr   string    `protobuf:"bytes,2,opt,name=ipaddr" json:"ipaddr,omitempty"`
 	Domain   string    `protobuf:"bytes,3,opt,name=domain" json:"domain,omitempty"`
 	Location *Location `protobuf:"bytes,4,opt,name=location" json:"location,omitempty"`
 }
 
-func (m *Device) Reset()                    { *m = Device{} }
-func (m *Device) String() string            { return proto.CompactTextString(m) }
-func (*Device) ProtoMessage()               {}
+// Reset the message
+func (m *Device) Reset() { *m = Device{} }
+
+// String returns a string representation of the message
+func (m *Device) String() string { return proto.CompactTextString(m) }
+
+// ProtoMessage is a generated method
+func (*Device) ProtoMessage() {}
+
+// Descriptor is a generated method
 func (*Device) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{2} }
 
+// GetLocation is a generated function that returns the location message if it exists
 func (m *Device) GetLocation() *Location {
 	if m != nil {
 		return m.Location
@@ -90,15 +112,23 @@ type EchoRequest struct {
 	Sequence int64   `protobuf:"varint,1,opt,name=sequence" json:"sequence,omitempty"`
 	Sender   *Device `protobuf:"bytes,2,opt,name=sender" json:"sender,omitempty"`
 	Sent     *Time   `protobuf:"bytes,3,opt,name=sent" json:"sent,omitempty"`
-	Ttl      int64   `protobuf:"varint,4,opt,name=ttl" json:"ttl,omitempty"`
+	TTL      int64   `protobuf:"varint,4,opt,name=ttl" json:"ttl,omitempty"`
 	Payload  []byte  `protobuf:"bytes,15,opt,name=payload,proto3" json:"payload,omitempty"`
 }
 
-func (m *EchoRequest) Reset()                    { *m = EchoRequest{} }
-func (m *EchoRequest) String() string            { return proto.CompactTextString(m) }
-func (*EchoRequest) ProtoMessage()               {}
+// Reset the message
+func (m *EchoRequest) Reset() { *m = EchoRequest{} }
+
+// String returns a string representation of the message
+func (m *EchoRequest) String() string { return proto.CompactTextString(m) }
+
+// ProtoMessage is a generated method
+func (*EchoRequest) ProtoMessage() {}
+
+// Descriptor is a generated method
 func (*EchoRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
+// GetSender returns the sender message if it exists
 func (m *EchoRequest) GetSender() *Device {
 	if m != nil {
 		return m.Sender
@@ -106,6 +136,7 @@ func (m *EchoRequest) GetSender() *Device {
 	return nil
 }
 
+// GetSent returns the sent time struct if it exists
 func (m *EchoRequest) GetSent() *Time {
 	if m != nil {
 		return m.Sent
@@ -121,11 +152,19 @@ type EchoReply struct {
 	Echo     *EchoRequest `protobuf:"bytes,4,opt,name=echo" json:"echo,omitempty"`
 }
 
-func (m *EchoReply) Reset()                    { *m = EchoReply{} }
-func (m *EchoReply) String() string            { return proto.CompactTextString(m) }
-func (*EchoReply) ProtoMessage()               {}
+// Reset the message
+func (m *EchoReply) Reset() { *m = EchoReply{} }
+
+// String returns a string representation of the message
+func (m *EchoReply) String() string { return proto.CompactTextString(m) }
+
+// ProtoMessage is a generated method
+func (*EchoReply) ProtoMessage() {}
+
+// Descriptor is a generated method
 func (*EchoReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
+// GetReceiver returns the receiver message if it exists
 func (m *EchoReply) GetReceiver() *Device {
 	if m != nil {
 		return m.Receiver
@@ -133,6 +172,7 @@ func (m *EchoReply) GetReceiver() *Device {
 	return nil
 }
 
+// GetReceived returns the received timestamp message if it exists
 func (m *EchoReply) GetReceived() *Time {
 	if m != nil {
 		return m.Received
@@ -140,6 +180,7 @@ func (m *EchoReply) GetReceived() *Time {
 	return nil
 }
 
+// GetEcho returns the echo message if it exists
 func (m *EchoReply) GetEcho() *EchoRequest {
 	if m != nil {
 		return m.Echo
@@ -165,6 +206,7 @@ const _ = grpc.SupportPackageIsVersion2
 
 // Client API for EchoService service
 
+// EchoServiceClient is a generated interface
 type EchoServiceClient interface {
 	// Reflect allows nodes to respond to echo requests with echo replies.
 	Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoReply, error)
@@ -174,10 +216,12 @@ type echoServiceClient struct {
 	cc *grpc.ClientConn
 }
 
+// NewEchoServiceClient is a generated function
 func NewEchoServiceClient(cc *grpc.ClientConn) EchoServiceClient {
 	return &echoServiceClient{cc}
 }
 
+// Echo is a generated function
 func (c *echoServiceClient) Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoReply, error) {
 	out := new(EchoReply)
 	err := grpc.Invoke(ctx, "/echo.EchoService/Echo", in, out, c.cc, opts...)
@@ -189,16 +233,18 @@ func (c *echoServiceClient) Echo(ctx context.Context, in *EchoRequest, opts ...g
 
 // Server API for EchoService service
 
+// EchoServiceServer is a generated interface
 type EchoServiceServer interface {
 	// Reflect allows nodes to respond to echo requests with echo replies.
 	Echo(context.Context, *EchoRequest) (*EchoReply, error)
 }
 
+// RegisterEchoServiceServer is a generated function
 func RegisterEchoServiceServer(s *grpc.Server, srv EchoServiceServer) {
-	s.RegisterService(&_EchoService_serviceDesc, srv)
+	s.RegisterService(&_EchoServiceserviceDesc, srv)
 }
 
-func _EchoService_Echo_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _EchoServiceEchoHandler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(EchoRequest)
 	if err := dec(in); err != nil {
 		return nil, err
@@ -216,13 +262,13 @@ func _EchoService_Echo_Handler(srv interface{}, ctx context.Context, dec func(in
 	return interceptor(ctx, in, info, handler)
 }
 
-var _EchoService_serviceDesc = grpc.ServiceDesc{
+var _EchoServiceserviceDesc = grpc.ServiceDesc{
 	ServiceName: "echo.EchoService",
 	HandlerType: (*EchoServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Echo",
-			Handler:    _EchoService_Echo_Handler,
+			Handler:    _EchoServiceEchoHandler,
 		},
 	},
 	Streams: []grpc.StreamDesc{},

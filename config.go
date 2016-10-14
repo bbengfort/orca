@@ -1,6 +1,7 @@
 package orca
 
 import (
+	"fmt"
 	"io/ioutil"
 	"os"
 	"os/user"
@@ -24,17 +25,27 @@ func getCwd() string {
 // ConfigPath specifies the locations to look up configurations
 var ConfigPath = []string{
 	"/etc/orca.yml",
-	filepath.Join(getUserDir(), ".orca.yml"),
+	filepath.Join(getUserDir(), ".orca", "config.yml"),
 	filepath.Join(getCwd(), "orca.yml"),
-	filepath.Join(getCwd(), "conf", "orca.yml"),
+}
+
+// LoadConfig the configuration from the ConfigPath
+func LoadConfig() *Config {
+	config := new(Config)
+
+	for _, path := range ConfigPath {
+		config.Read(path)
+	}
+
+	return config
 }
 
 // Config is read from a YAML file and defines the current configuration of
 // the project and can be exported as such.
 type Config struct {
-	Debug  bool   `default:"true"`
-	Name   string `required:"true"`
-	Addr   string `required:"true"`
+	Debug  bool
+	Name   string
+	Addr   string
 	Domain string
 }
 
@@ -46,7 +57,17 @@ func (conf *Config) Parse(data []byte) error {
 	}
 
 	// Perform validation and set defaults.
-	// TODO: Use reflection to validate the YAML and only set new values
+	if conf.Name == "" {
+
+		// If no name specified, use the hostname of the machine
+		name, err := os.Hostname()
+
+		if err != nil {
+			// If this lookup fails, specify unknown device
+			name = "unknown device"
+		}
+		conf.Name = name
+	}
 
 	// Return nil if there was no error
 	return nil
@@ -66,13 +87,19 @@ func (conf *Config) Read(path string) error {
 	return nil
 }
 
-// LoadConfig the configuration from the ConfigPath
-func LoadConfig() *Config {
-	config := new(Config)
+// String returns a string representation of the configuration
+func (conf Config) String() string {
+	output := fmt.Sprintf("%s configuration (debug = %t)", conf.Name, conf.Debug)
 
-	for _, path := range ConfigPath {
-		config.Read(path)
+	addr, err := ResolveAddr(conf.Addr)
+	if err != nil {
+		addr = "no resolved IP address!"
+	}
+	output += fmt.Sprintf("\nIP Address: %s", addr)
+
+	if conf.Domain != "" {
+		output += fmt.Sprintf(" | Domain: %s", conf.Domain)
 	}
 
-	return config
+	return output
 }

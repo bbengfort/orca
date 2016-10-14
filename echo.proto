@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package echo;
+package orca;
 
 // Time preserves nanosecond latency measurements by using a custom time
 // struct which should include either seconds or nanoseconds since the Unix
