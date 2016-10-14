@@ -3,7 +3,7 @@
 // DO NOT EDIT!
 
 /*
-Package orca is a generated protocol buffer package.
+Package echo is a generated protocol buffer package.
 
 It is generated from these files:
 	echo.proto
@@ -12,10 +12,10 @@ It has these top-level messages:
 	Time
 	Location
 	Device
-	EchoRequest
-	EchoReply
+	Request
+	Reply
 */
-package orca
+package echo
 
 import proto "github.com/golang/protobuf/proto"
 import fmt "fmt"
@@ -107,8 +107,8 @@ func (m *Device) GetLocation() *Location {
 	return nil
 }
 
-// EchoRequest is used to measure latency and uptime.
-type EchoRequest struct {
+// Request is used to measure latency and uptime.
+type Request struct {
 	Sequence int64   `protobuf:"varint,1,opt,name=sequence" json:"sequence,omitempty"`
 	Sender   *Device `protobuf:"bytes,2,opt,name=sender" json:"sender,omitempty"`
 	Sent     *Time   `protobuf:"bytes,3,opt,name=sent" json:"sent,omitempty"`
@@ -117,19 +117,19 @@ type EchoRequest struct {
 }
 
 // Reset the message
-func (m *EchoRequest) Reset() { *m = EchoRequest{} }
+func (m *Request) Reset() { *m = Request{} }
 
 // String returns a string representation of the message
-func (m *EchoRequest) String() string { return proto.CompactTextString(m) }
+func (m *Request) String() string { return proto.CompactTextString(m) }
 
 // ProtoMessage is a generated method
-func (*EchoRequest) ProtoMessage() {}
+func (*Request) ProtoMessage() {}
 
 // Descriptor is a generated method
-func (*EchoRequest) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
+func (*Request) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{3} }
 
 // GetSender returns the sender message if it exists
-func (m *EchoRequest) GetSender() *Device {
+func (m *Request) GetSender() *Device {
 	if m != nil {
 		return m.Sender
 	}
@@ -137,35 +137,35 @@ func (m *EchoRequest) GetSender() *Device {
 }
 
 // GetSent returns the sent time struct if it exists
-func (m *EchoRequest) GetSent() *Time {
+func (m *Request) GetSent() *Time {
 	if m != nil {
 		return m.Sent
 	}
 	return nil
 }
 
-// EchoReply is used to respond to EchoRequest messages.
-type EchoReply struct {
-	Sequence int64        `protobuf:"varint,1,opt,name=sequence" json:"sequence,omitempty"`
-	Receiver *Device      `protobuf:"bytes,2,opt,name=receiver" json:"receiver,omitempty"`
-	Received *Time        `protobuf:"bytes,3,opt,name=received" json:"received,omitempty"`
-	Echo     *EchoRequest `protobuf:"bytes,4,opt,name=echo" json:"echo,omitempty"`
+// Reply is used to respond to Request messages.
+type Reply struct {
+	Sequence int64    `protobuf:"varint,1,opt,name=sequence" json:"sequence,omitempty"`
+	Receiver *Device  `protobuf:"bytes,2,opt,name=receiver" json:"receiver,omitempty"`
+	Received *Time    `protobuf:"bytes,3,opt,name=received" json:"received,omitempty"`
+	Echo     *Request `protobuf:"bytes,4,opt,name=echo" json:"echo,omitempty"`
 }
 
 // Reset the message
-func (m *EchoReply) Reset() { *m = EchoReply{} }
+func (m *Reply) Reset() { *m = Reply{} }
 
 // String returns a string representation of the message
-func (m *EchoReply) String() string { return proto.CompactTextString(m) }
+func (m *Reply) String() string { return proto.CompactTextString(m) }
 
 // ProtoMessage is a generated method
-func (*EchoReply) ProtoMessage() {}
+func (*Reply) ProtoMessage() {}
 
 // Descriptor is a generated method
-func (*EchoReply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
+func (*Reply) Descriptor() ([]byte, []int) { return fileDescriptor0, []int{4} }
 
 // GetReceiver returns the receiver message if it exists
-func (m *EchoReply) GetReceiver() *Device {
+func (m *Reply) GetReceiver() *Device {
 	if m != nil {
 		return m.Receiver
 	}
@@ -173,7 +173,7 @@ func (m *EchoReply) GetReceiver() *Device {
 }
 
 // GetReceived returns the received timestamp message if it exists
-func (m *EchoReply) GetReceived() *Time {
+func (m *Reply) GetReceived() *Time {
 	if m != nil {
 		return m.Received
 	}
@@ -181,7 +181,7 @@ func (m *EchoReply) GetReceived() *Time {
 }
 
 // GetEcho returns the echo message if it exists
-func (m *EchoReply) GetEcho() *EchoRequest {
+func (m *Reply) GetEcho() *Request {
 	if m != nil {
 		return m.Echo
 	}
@@ -192,8 +192,8 @@ func init() {
 	proto.RegisterType((*Time)(nil), "echo.Time")
 	proto.RegisterType((*Location)(nil), "echo.Location")
 	proto.RegisterType((*Device)(nil), "echo.Device")
-	proto.RegisterType((*EchoRequest)(nil), "echo.EchoRequest")
-	proto.RegisterType((*EchoReply)(nil), "echo.EchoReply")
+	proto.RegisterType((*Request)(nil), "echo.Request")
+	proto.RegisterType((*Reply)(nil), "echo.Reply")
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -204,71 +204,71 @@ var _ grpc.ClientConn
 // is compatible with the grpc package it is being compiled against.
 const _ = grpc.SupportPackageIsVersion2
 
-// Client API for EchoService service
+// Client API for Orca service
 
-// EchoServiceClient is a generated interface
-type EchoServiceClient interface {
+// OrcaClient is a generated interface
+type OrcaClient interface {
 	// Reflect allows nodes to respond to echo requests with echo replies.
-	Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoReply, error)
+	Echo(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error)
 }
 
-type echoServiceClient struct {
+type orcaClient struct {
 	cc *grpc.ClientConn
 }
 
-// NewEchoServiceClient is a generated function
-func NewEchoServiceClient(cc *grpc.ClientConn) EchoServiceClient {
-	return &echoServiceClient{cc}
+// NewOrcaClient is a generated function
+func NewOrcaClient(cc *grpc.ClientConn) OrcaClient {
+	return &orcaClient{cc}
 }
 
 // Echo is a generated function
-func (c *echoServiceClient) Echo(ctx context.Context, in *EchoRequest, opts ...grpc.CallOption) (*EchoReply, error) {
-	out := new(EchoReply)
-	err := grpc.Invoke(ctx, "/echo.EchoService/Echo", in, out, c.cc, opts...)
+func (c *orcaClient) Echo(ctx context.Context, in *Request, opts ...grpc.CallOption) (*Reply, error) {
+	out := new(Reply)
+	err := grpc.Invoke(ctx, "/echo.Orca/Echo", in, out, c.cc, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// Server API for EchoService service
+// Server API for Orca service
 
-// EchoServiceServer is a generated interface
-type EchoServiceServer interface {
+// OrcaServer is a generated interface
+type OrcaServer interface {
 	// Reflect allows nodes to respond to echo requests with echo replies.
-	Echo(context.Context, *EchoRequest) (*EchoReply, error)
+	Echo(context.Context, *Request) (*Reply, error)
 }
 
-// RegisterEchoServiceServer is a generated function
-func RegisterEchoServiceServer(s *grpc.Server, srv EchoServiceServer) {
-	s.RegisterService(&_EchoServiceserviceDesc, srv)
+// RegisterOrcaServer is a generated function
+func RegisterOrcaServer(s *grpc.Server, srv OrcaServer) {
+	s.RegisterService(&_OrcaserviceDesc, srv)
 }
 
-func _EchoServiceEchoHandler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(EchoRequest)
+func _OrcaEchoHandler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(Request)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(EchoServiceServer).Echo(ctx, in)
+		return srv.(OrcaServer).Echo(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: "/echo.EchoService/Echo",
+		FullMethod: "/echo.Orca/Echo",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(EchoServiceServer).Echo(ctx, req.(*EchoRequest))
+		return srv.(OrcaServer).Echo(ctx, req.(*Request))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-var _EchoServiceserviceDesc = grpc.ServiceDesc{
-	ServiceName: "echo.EchoService",
-	HandlerType: (*EchoServiceServer)(nil),
+var _OrcaserviceDesc = grpc.ServiceDesc{
+	ServiceName: "echo.Orca",
+	HandlerType: (*OrcaServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Echo",
-			Handler:    _EchoServiceEchoHandler,
+			Handler:    _OrcaEchoHandler,
 		},
 	},
 	Streams: []grpc.StreamDesc{},

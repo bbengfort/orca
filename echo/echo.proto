@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package orca;
+package echo;
 
 // Time preserves nanosecond latency measurements by using a custom time
 // struct which should include either seconds or nanoseconds since the Unix
@@ -30,8 +30,8 @@ message Device {
     Location location = 4;
 }
 
-// EchoRequest is used to measure latency and uptime.
-message EchoRequest {
+// Request is used to measure latency and uptime.
+message Request {
     int64 sequence = 1;
     Device sender = 2;
     Time sent = 3;
@@ -39,8 +39,8 @@ message EchoRequest {
     bytes payload = 15;
 }
 
-// EchoReply is used to respond to EchoRequest messages.
-message EchoReply {
+// Reply is used to respond to EchoRequest messages.
+message Reply {
     int64 sequence = 1;
     Device receiver = 2;
     Time received = 3;
@@ -48,8 +48,8 @@ message EchoReply {
 }
 
 
-// Echo is the service definition for nodes.
-service EchoService {
+// Orca is the service definition for nodes.
+service Orca {
 
     // Reflect allows nodes to respond to echo requests with echo replies.
     rpc Echo (EchoRequest) returns (EchoReply) {}

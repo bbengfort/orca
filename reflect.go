@@ -6,21 +6,22 @@ import (
 	"net"
 	"time"
 
+	"github.com/bbengfort/orca/echo"
 	"golang.org/x/net/context"
 	"google.golang.org/grpc"
 )
 
 // Echo implements the echo.EchoServer interface on the App
-func (app *App) Echo(ctx context.Context, in *EchoRequest) (*EchoReply, error) {
+func (app *App) Echo(ctx context.Context, in *echo.Request) (*echo.Reply, error) {
 
 	// Log the echo request
 	if app.Config.Debug {
 		fmt.Println(in)
 	}
 
-	// Return the EchoReply
-	return &EchoReply{
-		Received: &Time{
+	// Return the Reply
+	return &echo.Reply{
+		Received: &echo.Time{
 			Seconds:     0,
 			Nanoseconds: time.Now().UnixNano(),
 		},
@@ -48,7 +49,7 @@ func (app *App) Reflect() error {
 
 	// Create the grpc server, handler, and listen
 	server := grpc.NewServer()
-	RegisterEchoServiceServer(server, app)
+	echo.RegisterOrcaServer(server, app)
 	server.Serve(sock)
 
 	// Serve until finished

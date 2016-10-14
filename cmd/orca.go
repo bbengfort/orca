@@ -84,25 +84,12 @@ func startReflector(c *cli.Context) error {
 }
 
 func startGenerator(c *cli.Context) error {
-	addr, err := orca.ResolveAddr("")
-	device := &orca.Device{
-		Name:   "apollo",
-		IPAddr: addr,
+
+	if err := orcaApp.Generate(); err != nil {
+		return cli.NewExitError(err.Error(), 2)
 	}
 
-	reply, err := orca.Ping(device)
-	if err != nil {
-		return cli.NewExitError(err.Error(), 1)
-	}
-
-	fmt.Println(reply)
 	return nil
-
-	// if err := orcaApp.Generate(); err != nil {
-	// 	return cli.NewExitError(err.Error(), 2)
-	// }
-	//
-	// return nil
 }
 
 func printConfig(c *cli.Context) error {

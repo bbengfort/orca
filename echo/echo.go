@@ -1,4 +1,4 @@
-package orca
+package echo
 
 import "time"
 
@@ -13,13 +13,13 @@ func (ts *Time) Parse() time.Time {
 }
 
 // GetSentTime parses the sent time on an Echo message to a time.Time
-func (m *EchoRequest) GetSentTime() time.Time {
+func (m *Request) GetSentTime() time.Time {
 	ts := m.GetSent()
 	return ts.Parse()
 }
 
-// GetReceivedTime parses the received time on an EchoReply message to a time.Time
-func (m *EchoReply) GetReceivedTime() time.Time {
+// GetReceivedTime parses the received time on an Reply message to a time.Time
+func (m *Reply) GetReceivedTime() time.Time {
 	ts := m.GetReceived()
 	return ts.Parse()
 }
