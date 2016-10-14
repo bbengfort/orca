@@ -47,6 +47,7 @@ type Config struct {
 	Name   string
 	Addr   string
 	Domain string
+	DBPath string `yaml:"dbpath"`
 }
 
 // Parse configuration from data
@@ -67,6 +68,11 @@ func (conf *Config) Parse(data []byte) error {
 			name = "unknown device"
 		}
 		conf.Name = name
+	}
+
+	if conf.DBPath == "" {
+		// If no database path specified, store in the home directory
+		conf.DBPath = filepath.Join(getUserDir(), ".orca", "orca.db")
 	}
 
 	// Return nil if there was no error
@@ -100,6 +106,8 @@ func (conf Config) String() string {
 	if conf.Domain != "" {
 		output += fmt.Sprintf(" | Domain: %s", conf.Domain)
 	}
+
+	output += fmt.Sprintf("\nDatabase: %s", conf.DBPath)
 
 	return output
 }
