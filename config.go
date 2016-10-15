@@ -40,14 +40,21 @@ func LoadConfig() *Config {
 	return config
 }
 
+// MaxMindConfig specifies the MaxMind API credentials
+type MaxMindConfig struct {
+	Username string // MaxMind User ID
+	License  string // MaxMind License Key
+}
+
 // Config is read from a YAML file and defines the current configuration of
 // the project and can be exported as such.
 type Config struct {
-	Debug  bool
-	Name   string
-	Addr   string
-	Domain string
-	DBPath string `yaml:"dbpath"`
+	Debug   bool
+	Name    string
+	Addr    string
+	Domain  string
+	DBPath  string `yaml:"dbpath"`
+	MaxMind *MaxMindConfig
 }
 
 // Parse configuration from data
@@ -73,6 +80,10 @@ func (conf *Config) Parse(data []byte) error {
 	if conf.DBPath == "" {
 		// If no database path specified, store in the home directory
 		conf.DBPath = filepath.Join(getUserDir(), ".orca", "orca.db")
+	}
+
+	if conf.MaxMind == nil {
+		conf.MaxMind = &MaxMindConfig{}
 	}
 
 	// Return nil if there was no error
@@ -108,6 +119,10 @@ func (conf Config) String() string {
 	}
 
 	output += fmt.Sprintf("\nDatabase: %s", conf.DBPath)
+
+	if conf.MaxMind != nil {
+		output += fmt.Sprintf("\nMaxMind: User=%s License=%s", conf.MaxMind.Username, conf.MaxMind.License)
+	}
 
 	return output
 }

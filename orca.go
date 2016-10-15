@@ -11,8 +11,10 @@ const Version = "0.1"
 // and device details as well as initializes the environment and runs the
 // reflect and generate commands.
 type App struct {
-	Config *Config // The configuration loaded from the YAML file
-	db     *sql.DB // Connection to the database stored on the app
+	Config *Config        // The configuration loaded from the YAML file
+	GeoIP  *MaxMindClient // GeoIP Lookup API client
+	db     *sql.DB        // Connection to the database stored on the app
+
 }
 
 // Init the orca application
@@ -27,6 +29,11 @@ func Init() (*App, error) {
 	if err = app.ConnectDB(); err != nil {
 		return nil, err
 	}
+
+	// Initialize the MaxMindClient for GeoIP lookup
+	app.GeoIP = NewMaxMindClient(
+		app.Config.MaxMind.Username, app.Config.MaxMind.License,
+	)
 
 	return app, nil
 }

@@ -25,3 +25,12 @@ addr: :3265
 
 # The domain name of the advice
 domain: null
+
+# The path to the sqlite database that stores ping information
+# By default this is stored in ~/.orca/orca.db
+dbpath: null
+
+# MaxMind API credentials for GeoIP2 lookup
+maxmind:
+    username: null
+    license: null

@@ -113,6 +113,18 @@ func (d *Device) Exists(id int64, db *sql.DB) (bool, error) {
 // Location Methods
 /////////////////////////////////////////////////////////////////////////////
 
+// String returns a pretty representation of the location
+func (loc *Location) String() string {
+	output := fmt.Sprintf("%s is located at %s, %s (%f, %f)", loc.IPAddr, loc.City, loc.Country, loc.Latitude, loc.Longitude)
+	if loc.Organization != "" {
+		output += fmt.Sprintf("\nOrganization: %s", loc.Organization)
+		if loc.Domain != "" {
+			output += fmt.Sprintf(" (%s)", loc.Domain)
+		}
+	}
+	return output
+}
+
 // Get a location from the database by ID and populate the struct fields.
 func (loc *Location) Get(id int64, db *sql.DB) error {
 	row := db.QueryRow("SELECT * FROM locations WHERE id = $1", id)

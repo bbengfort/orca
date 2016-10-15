@@ -105,7 +105,14 @@ func startGenerator(c *cli.Context) error {
 
 func printConfig(c *cli.Context) error {
 	// Print the configuration and exit
-	fmt.Println(orcaApp.Config.String())
+	// fmt.Println(orcaApp.Config.String())
+
+	loc, err := orcaApp.GeoIP.GetCurrentLocation()
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+
+	fmt.Println(loc.String())
 	return nil
 }
 
