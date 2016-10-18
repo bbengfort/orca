@@ -83,15 +83,24 @@ func (d *Device) Save(db *sql.DB) (bool, error) {
 	d.Created = time.Now()
 	d.Updated = time.Now()
 
-	// Execute the INSERT query against the dtabase
-	query := "INSERT INTO devices (name, ipaddr, domain, created, updated) VALUES ($1, $2, $3, $4, $5) RETURNING id"
-	row := db.QueryRow(query, d.Name, d.IPAddr, d.Domain, d.Created, d.Updated)
-	err := row.Scan(&d.ID)
+	// Create the query to insert the device into the database
+	query := "INSERT INTO devices (name, ipaddr, domain, created, updated) VALUES ($1, $2, $3, $4, $5)"
+	query += "; SELECT last_insert_rowid() FROM locations"
 
+	// Execute the INSERT query against the dtabase
+	res, err := db.Exec(query, d.Name, d.IPAddr, d.Domain, d.Created, d.Updated)
 	if err != nil {
 		return false, err
 	}
 
+	// Look up the last inserted ID from sqlite3
+	did, err := res.LastInsertId()
+	if err != nil {
+		return false, err
+	}
+
+	// Store the ID and return
+	d.ID = did
 	return true, err
 }
 
@@ -101,12 +110,12 @@ func (d *Device) Delete(db *sql.DB) (bool, error) {
 	return deleteFromDatabase(db, "devices", d.ID)
 }
 
-// Exists checks if the specified location is in the database.
+// Exists checks if the specified device is in the database.
 func (d *Device) Exists(id int64, db *sql.DB) (bool, error) {
 	if id == 0 {
 		id = d.ID
 	}
-	return existsInDatabase(db, "locations", id)
+	return existsInDatabase(db, "devices", id)
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -159,15 +168,24 @@ func (loc *Location) Save(db *sql.DB) (bool, error) {
 	loc.Created = time.Now()
 	loc.Updated = time.Now()
 
-	// Execute the INSERT query against the dtabase
-	query := "INSERT INTO locations (ipaddr, latitude, longitude, city, postcode, country, organization, domain, created, updated) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10) RETURNING id"
-	row := db.QueryRow(query)
-	err := row.Scan(&loc.ID)
+	// Construct the query
+	query := "INSERT INTO locations (ipaddr, latitude, longitude, city, postcode, country, organization, domain, created, updated)"
+	query += " VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
 
+	// Execute the INSERT query against the dtabase
+	res, err := db.Exec(query, loc.IPAddr, loc.Latitude, loc.Longitude, loc.City, loc.PostCode, loc.Country, loc.Organization, loc.Domain, loc.Created, loc.Updated)
 	if err != nil {
 		return false, err
 	}
 
+	// Get the last inserted ID from SQLite3
+	lid, err := res.LastInsertId()
+	if err != nil {
+		return false, err
+	}
+
+	// Store the ID on the location and return
+	loc.ID = lid
 	return true, err
 }
 
@@ -183,6 +201,16 @@ func (loc *Location) Exists(id int64, db *sql.DB) (bool, error) {
 		id = loc.ID
 	}
 	return existsInDatabase(db, "locations", id)
+}
+
+// IPExists sets the ID on the location if the location's IP address is
+// already in the database, otherwise it sets it to zero.
+func (loc *Location) IPExists(db *sql.DB) error {
+	query := "SELECT id FROM locations WHERE ipaddr = $1 LIMIT 1"
+	row := db.QueryRow(query, loc.IPAddr)
+	err := row.Scan(&loc.ID)
+
+	return err
 }
 
 /////////////////////////////////////////////////////////////////////////////

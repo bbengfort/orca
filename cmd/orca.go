@@ -48,6 +48,12 @@ func main() {
 			Name:   "config",
 			Usage:  "print the configuration and exit",
 			Action: printConfig,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "s, sync",
+					Usage: "synchronize external IP and location",
+				},
+			},
 		},
 		{
 			Name:   "createdb",
@@ -105,14 +111,18 @@ func startGenerator(c *cli.Context) error {
 
 func printConfig(c *cli.Context) error {
 	// Print the configuration and exit
-	// fmt.Println(orcaApp.Config.String())
+	fmt.Println(orcaApp.Config.String())
 
-	loc, err := orcaApp.GeoIP.GetCurrentLocation()
-	if err != nil {
-		return cli.NewExitError(err.Error(), 1)
+	if c.Bool("sync") {
+		// Call syncrhonize on the application
+		if err := orcaApp.SyncLocation(); err != nil {
+			return cli.NewExitError(err.Error(), 4)
+		}
+
+		// Print the current location and IP Address
+		fmt.Printf("Current IP Adress: %s\nCurrent Location: %s\n", orcaApp.ExternalIP, orcaApp.Location.String())
 	}
 
-	fmt.Println(loc.String())
 	return nil
 }
 

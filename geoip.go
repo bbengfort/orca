@@ -148,7 +148,7 @@ func nestedFloat64Lookup(data map[string]interface{}, keys []string) float64 {
 func (mm *MaxMindClient) GetCurrentLocation() (*Location, error) {
 
 	// Perform the GeoIP lookup
-	data, err := mm.GeoIPLookup("12.222.31.32")
+	data, err := mm.GeoIPLookup("")
 	if err != nil {
 		return nil, err
 	}

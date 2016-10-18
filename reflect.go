@@ -33,7 +33,7 @@ func (app *App) Echo(ctx context.Context, in *echo.Request) (*echo.Reply, error)
 // Reflect listens for EchoRequests and Replies to them.
 func (app *App) Reflect() error {
 	// Look up the address to listen on
-	addr, err := app.GetAddr()
+	addr, err := app.GetListenAddr()
 	if err != nil {
 		return err
 	}
