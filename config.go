@@ -49,12 +49,13 @@ type MaxMindConfig struct {
 // Config is read from a YAML file and defines the current configuration of
 // the project and can be exported as such.
 type Config struct {
-	Debug   bool
-	Name    string
-	Addr    string
-	Domain  string
-	DBPath  string `yaml:"dbpath"`
-	MaxMind *MaxMindConfig
+	Debug    bool   `yaml:"debug"`    // Print out log messages or not
+	Name     string `yaml:"name"`     // The name of hte local device
+	Addr     string `yaml:"addr"`     // The listen address of the local device
+	Domain   string `yaml:"domain"`   // The domain name of the local device
+	Interval int64  `yaml:"interval"` // The wait in seconds between pings to reflectors
+	DBPath   string `yaml:"dbpath"`   // The path to the SQLite3 database
+	MaxMind  *MaxMindConfig
 }
 
 // Parse configuration from data
@@ -118,6 +119,7 @@ func (conf Config) String() string {
 		output += fmt.Sprintf(" | Domain: %s", conf.Domain)
 	}
 
+	output += fmt.Sprintf("\nPing Interval: %d seconds", conf.Interval)
 	output += fmt.Sprintf("\nDatabase: %s", conf.DBPath)
 
 	if conf.MaxMind != nil {

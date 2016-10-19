@@ -51,15 +51,29 @@ func (app *App) GetDB() *sql.DB {
 // timestamp. This function expects you to limit the size of the collection
 // by specifying the maximum number of nodes to return in the Devices list.
 func (app *App) FetchDevices() (Devices, error) {
+	query := "SELECT * FROM devices ORDER BY created DESC"
+	return createDeviceList(app.db, query)
+}
+
+// FetchDevicesExcept the specified device by excluding the device ID from the
+// SQL query. Allows the creation of a device list except for the local device.
+func (app *App) FetchDevicesExcept(device *Device) (Devices, error) {
+	query := "SELECT * FROM devices WHERE id != $1 ORDER BY created DESC"
+	return createDeviceList(app.db, query, device.ID)
+}
+
+// Helper function that queries the devices table in the database and returns
+// a list of devices or an error. Allows arbitrary query construction.
+func createDeviceList(db *sql.DB, query string, args ...interface{}) (Devices, error) {
 	var devices Devices
 
-	rows, err := app.db.Query("SELECT * FROM devices ORDER BY created DESC")
+	rows, err := db.Query(query, args...)
 	if err != nil {
 		return devices, err
 	}
 
 	for rows.Next() {
-		var d Device
+		d := new(Device)
 		if err := rows.Scan(&d.ID, &d.Name, &d.IPAddr, &d.Domain, &d.Sequence, &d.Created, &d.Updated); err != nil {
 			return devices, err
 		}

@@ -26,6 +26,9 @@ addr: :3265
 # The domain name of the advice
 domain: null
 
+# The interval in seconds between ping requests to all reflectors 
+interval: 12
+
 # The path to the sqlite database that stores ping information
 # By default this is stored in ~/.orca/orca.db
 dbpath: null

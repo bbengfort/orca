@@ -51,6 +51,7 @@ CREATE TABLE "locations"
     "country" TEXT,
     "organization",
     "domain" TEXT,
+    "note" TEXT,
     "created" DATETIME,
     "updated" DATETIME
 );

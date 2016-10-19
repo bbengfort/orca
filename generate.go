@@ -16,23 +16,44 @@ const Timeout = time.Duration(30) * time.Second
 // Generate is long running function that initializes pings then sleeps.
 func (app *App) Generate() error {
 
-	// Temporarily just ping the local machine
-	device := new(Device)
-	if err := device.GetByName("apollo", app.db); err != nil {
-		return err
-	}
+	// Compute the interval from the configuration
+	interval := time.Duration(app.Config.Interval) * time.Second
 
-	addr, err := ResolveAddr(device.IPAddr)
+	// Load a list of devices except the current device
+	local := app.GetDevice()
+	devices, err := app.FetchDevicesExcept(local)
 	if err != nil {
 		return err
 	}
-	device.IPAddr = addr
 
-	if err := app.Ping(device); err != nil {
-		return err
+	// Resolve the addresses for all the devices
+	for _, device := range devices {
+		addr, aerr := ResolveAddr(device.IPAddr)
+		if aerr != nil {
+			return aerr
+		}
+
+		device.IPAddr = addr
 	}
 
-	return nil
+	// Loop forever with a delay between the interval
+	for {
+
+		// Wait for the specified interval
+		select {
+		case <-time.After(interval):
+			// This breaks out of select not the for loop
+			break
+		}
+
+		// Ping all the devices in the database
+		for _, device := range devices {
+			if perr := app.Ping(device); err != nil {
+				return perr
+			}
+		}
+	}
+
 }
 
 // Ping sends an echo request to a device and handles the response

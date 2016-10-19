@@ -40,7 +40,7 @@ type Device struct {
 }
 
 // Devices is a collection of Device objects loaded from the database.
-type Devices []Device
+type Devices []*Device
 
 // Location is a geographic record that is usually associated with an IP
 // address via the geoip lookup service but could also come from GPS.
@@ -53,6 +53,7 @@ type Location struct {
 	Country      string  // Country returned by MaxMind for the IP address
 	Organization string  // Organization associated with the given domain (ISP)
 	Domain       string  // Domain associated with the IP address (ISP)
+	Note         string  // Any additional annotations by the user
 	ModelMeta
 }
 
@@ -184,7 +185,7 @@ func (loc *Location) Get(id int64, db *sql.DB) error {
 	err := row.Scan(
 		&loc.ID, &loc.IPAddr, &loc.Latitude, &loc.Longitude,
 		&loc.City, &loc.PostCode, &loc.Country, &loc.Organization,
-		&loc.Domain, &loc.Created, &loc.Updated,
+		&loc.Domain, &loc.Note, &loc.Created, &loc.Updated,
 	)
 
 	return err
@@ -201,8 +202,8 @@ func (loc *Location) Save(db *sql.DB) (bool, error) {
 		loc.Updated = time.Now()
 
 		// Execute the query against the database
-		query := "UPDATE locations SET ipaddr=$1, latitude=$2, longitude=$3, city=$4, postcode=$5, country=$6, organization=$7, domain=$8, updated=$9 WHERE id = $10"
-		_, err := db.Exec(query, loc.IPAddr, loc.Latitude, loc.Longitude, loc.City, loc.PostCode, loc.Country, loc.Organization, loc.Domain, loc.Updated, loc.ID)
+		query := "UPDATE locations SET ipaddr=$1, latitude=$2, longitude=$3, city=$4, postcode=$5, country=$6, organization=$7, domain=$8, note=$9, updated=$10 WHERE id = $11"
+		_, err := db.Exec(query, loc.IPAddr, loc.Latitude, loc.Longitude, loc.City, loc.PostCode, loc.Country, loc.Organization, loc.Domain, loc.Note, loc.Updated, loc.ID)
 
 		return false, err
 	}
@@ -213,11 +214,11 @@ func (loc *Location) Save(db *sql.DB) (bool, error) {
 	loc.Updated = time.Now()
 
 	// Construct the query
-	query := "INSERT INTO locations (ipaddr, latitude, longitude, city, postcode, country, organization, domain, created, updated)"
-	query += " VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)"
+	query := "INSERT INTO locations (ipaddr, latitude, longitude, city, postcode, country, organization, domain, note, created, updated)"
+	query += " VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)"
 
 	// Execute the INSERT query against the dtabase
-	res, err := db.Exec(query, loc.IPAddr, loc.Latitude, loc.Longitude, loc.City, loc.PostCode, loc.Country, loc.Organization, loc.Domain, loc.Created, loc.Updated)
+	res, err := db.Exec(query, loc.IPAddr, loc.Latitude, loc.Longitude, loc.City, loc.PostCode, loc.Country, loc.Organization, loc.Domain, loc.Note, loc.Created, loc.Updated)
 	if err != nil {
 		return false, err
 	}
@@ -295,7 +296,7 @@ func (p *Ping) Get(id int64, db *sql.DB) error {
 		&p.Source.ID, &p.Source.Name, &p.Source.IPAddr, &p.Source.Domain, &p.Source.Sequence, &p.Source.Created, &p.Source.Updated,
 		&p.Target.ID, &p.Target.Name, &p.Target.IPAddr, &p.Target.Domain, &p.Target.Sequence, &p.Target.Created, &p.Target.Updated,
 		&p.Location.ID, &p.Location.IPAddr, &p.Location.Latitude, &p.Location.Longitude, &p.Location.City, &p.Location.PostCode,
-		&p.Location.Country, &p.Location.Organization, &p.Location.Domain, &p.Location.Created, &p.Location.Updated,
+		&p.Location.Country, &p.Location.Organization, &p.Location.Domain, &p.Location.Note, &p.Location.Created, &p.Location.Updated,
 	)
 
 	return err
