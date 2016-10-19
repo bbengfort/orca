@@ -58,8 +58,15 @@ type Location struct {
 
 // Ping is a timeseries record of latency requests reflected from echo servers.
 type Ping struct {
-	ID int64 //  Unique ID of the record
-
+	ID       int64           //  Unique ID of the record
+	Source   *Device         // Source device of the ping (always the local node)
+	Target   *Device         // Target device that the ping was sent to
+	Location *Location       // The location of the source at the time of the ping
+	Request  int64           // Request sequence number for the source/target pair
+	Response int64           // Response sequence number for the target/source pair
+	Sent     time.Time       // The time that the ping was sent
+	Recv     time.Time       // The time that the ping was received
+	Latency  sql.NullFloat64 // The latency in milliseconds of the ping
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -106,7 +113,6 @@ func (d *Device) Save(db *sql.DB) (bool, error) {
 
 	// Create the query to insert the device into the database
 	query := "INSERT INTO devices (name, ipaddr, domain, sequence, created, updated) VALUES ($1, $2, $3, $4, $5, $6)"
-	query += "; SELECT last_insert_rowid() FROM locations"
 
 	// Execute the INSERT query against the dtabase
 	res, err := db.Exec(query, d.Name, d.IPAddr, d.Domain, d.Sequence, d.Created, d.Updated)
@@ -261,6 +267,90 @@ func (loc *Location) String() string {
 		}
 	}
 	return output
+}
+
+/////////////////////////////////////////////////////////////////////////////
+// Ping Methods
+/////////////////////////////////////////////////////////////////////////////
+
+// Get a ping from the database by ID and populate the struct fields.
+func (p *Ping) Get(id int64, db *sql.DB) error {
+
+	// Construct the Ping query
+	query := "SELECT * from pings p "
+	query += "   JOIN devices s on p.source_id = s.id "
+	query += "   JOIN devices t on p.target_id = t.id "
+	query += "   JOIN locations l on p.location_id = l.id "
+	query += "WHERE p.id=$1"
+
+	// Create the empty struct targets
+	p.Source = new(Device)
+	p.Target = new(Device)
+	p.Location = new(Location)
+
+	// Execute the query and scann the ping
+	row := db.QueryRow(query, id)
+	err := row.Scan(
+		&p.ID, &p.Source.ID, &p.Target.ID, &p.Location.ID, &p.Request, &p.Response, &p.Sent, &p.Recv, &p.Latency,
+		&p.Source.ID, &p.Source.Name, &p.Source.IPAddr, &p.Source.Domain, &p.Source.Sequence, &p.Source.Created, &p.Source.Updated,
+		&p.Target.ID, &p.Target.Name, &p.Target.IPAddr, &p.Target.Domain, &p.Target.Sequence, &p.Target.Created, &p.Target.Updated,
+		&p.Location.ID, &p.Location.IPAddr, &p.Location.Latitude, &p.Location.Longitude, &p.Location.City, &p.Location.PostCode,
+		&p.Location.Country, &p.Location.Organization, &p.Location.Domain, &p.Location.Created, &p.Location.Updated,
+	)
+
+	return err
+}
+
+// Save a ping struct to the database. This function checks if the ping
+// has an ID or not. If it does, it will execute a SQL UPDATE, otherwise it
+// will execute a SQL INSERT. Returns a boolean if the device was inserted.
+// This method handles setting the created and updated timestamps as well.
+func (p *Ping) Save(db *sql.DB) (bool, error) {
+	if p.ID > 0 {
+		// This is the UPDATE method so return false.
+		// Execute the query against the database
+		query := "UPDATE pings SET "
+		query += "source_id=$1, target_id=$2, location_id=$3, request=$4, "
+		query += "response=$5, sent=$6, recv=$7, latency=$8 "
+		query += "WHERE id = $9"
+		_, err := db.Exec(query, p.Source.ID, p.Target.ID, p.Location.ID, p.Request, p.Response, p.Sent, p.Recv, p.Latency, p.ID)
+
+		return false, err
+	}
+
+	// This is the INSERT method, so return true
+	// Create the query to insert the device into the database
+	query := "INSERT INTO pings "
+	query += "(source_id, target_id, location_id, request, response, sent, recv, latency) "
+	query += "VALUES ($1, $2, $3, $4, $5, $6, $7, $8)"
+
+	// Execute the INSERT query against the dtabase
+	res, err := db.Exec(query, p.Source.ID, p.Target.ID, p.Location.ID, p.Request, p.Response, p.Sent, p.Recv, p.Latency)
+	if err != nil {
+		return false, err
+	}
+
+	// Look up the last inserted ID from sqlite3
+	pid, err := res.LastInsertId()
+	if err != nil {
+		return false, err
+	}
+
+	// Store the ID and return
+	p.ID = pid
+	return true, err
+}
+
+// Delete a ping from the database. Returns true if the number of rows
+// affected is 1 or false otherwise.
+func (p *Ping) Delete(db *sql.DB) (bool, error) {
+	return deleteFromDatabase(db, "pings", p.ID)
+}
+
+// String returns a pretty representation of the ping
+func (p *Ping) String() string {
+	output := "%s -> %s order=%d seq=%d %0.3fms"
+	return fmt.Sprintf(output, p.Source.Name, p.Target.Name, p.Request, p.Response, p.Latency)
 }
 
 /////////////////////////////////////////////////////////////////////////////

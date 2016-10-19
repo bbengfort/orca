@@ -71,6 +71,7 @@ CREATE TABLE "pings"
     "response" INTEGER,
     "sent" DATETIME NOT NULL,
     "recv" DATETIME,
+    "latency" REAL,
     FOREIGN KEY ("source_id") REFERENCES devices("id"),
     FOREIGN KEY ("target_id") REFERENCES devices("id"),
     FOREIGN KEY ("location_id") REFERENCES locations("id")

@@ -36,6 +36,7 @@ message Request {
     Device sender = 2;
     Time sent = 3;
     int64 ttl = 4;
+    int64 ping = 5;
     bytes payload = 15;
 }
 
@@ -44,7 +45,7 @@ message Reply {
     int64 sequence = 1;
     Device receiver = 2;
     Time received = 3;
-    EchoRequest echo = 4;
+    Request echo = 4;
 }
 
 
@@ -52,6 +53,6 @@ message Reply {
 service Orca {
 
     // Reflect allows nodes to respond to echo requests with echo replies.
-    rpc Echo (EchoRequest) returns (EchoReply) {}
+    rpc Echo (Request) returns (Reply) {}
 
 }

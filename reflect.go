@@ -13,15 +13,37 @@ import (
 // Echo implements the echo.EchoServer interface on the App
 func (app *App) Echo(ctx context.Context, in *echo.Request) (*echo.Reply, error) {
 
+	// Store the RECV timestamp before any work
+	recv := time.Now()
+
 	// Log the echo request
 	if app.Config.Debug {
 		log.Println(in.LogRecord())
 	}
 
+	// Figure out who the sender is to update meta
+	source := new(Device)
+	sender := in.GetSender()
+
+	if source != nil {
+		// Populate the source from the database
+		if err := source.GetByName(sender.Name, app.db); err != nil {
+			// No record is in the database so populate it
+			source.Name = sender.Name
+			source.IPAddr = sender.IPAddr
+			source.Domain = sender.Domain
+		}
+	}
+
+	// Bump the source sequence number and save
+	source.Sequence++
+	source.Save(app.db)
+
 	// Return the Reply
 	return &echo.Reply{
+		Sequence: source.Sequence,
 		Receiver: app.GetDevice().Echo(),
-		Received: &echo.Time{Nanoseconds: time.Now().UnixNano()},
+		Received: &echo.Time{Nanoseconds: recv.UnixNano()},
 		Echo:     in,
 	}, nil
 

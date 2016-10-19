@@ -232,5 +232,14 @@ func manageDevices(c *cli.Context) error {
 }
 
 func test(c *cli.Context) error {
+
+	db := orcaApp.GetDB()
+
+	ping := new(orca.Ping)
+	if err := ping.Get(1, db); err != nil {
+		return cli.NewExitError(err.Error(), 42)
+	}
+
+	fmt.Println(ping.String())
 	return nil
 }
