@@ -1,7 +1,6 @@
 package orca
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"time"
@@ -16,16 +15,14 @@ func (app *App) Echo(ctx context.Context, in *echo.Request) (*echo.Reply, error)
 
 	// Log the echo request
 	if app.Config.Debug {
-		fmt.Println(in)
+		log.Println(in.LogRecord())
 	}
 
 	// Return the Reply
 	return &echo.Reply{
-		Received: &echo.Time{
-			Seconds:     0,
-			Nanoseconds: time.Now().UnixNano(),
-		},
-		Echo: in,
+		Receiver: app.GetDevice().Echo(),
+		Received: &echo.Time{Nanoseconds: time.Now().UnixNano()},
+		Echo:     in,
 	}, nil
 
 }
@@ -45,7 +42,9 @@ func (app *App) Reflect() error {
 	}
 
 	// Log the fact that we are listening on the address
-	log.Printf("Listening for Echo Requests on %s\n", addr)
+	if app.Config.Debug {
+		log.Printf("Listening for Echo Requests on %s\n", addr)
+	}
 
 	// Create the grpc server, handler, and listen
 	server := grpc.NewServer()

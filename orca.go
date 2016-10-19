@@ -2,7 +2,10 @@
 // latency and uptime of mobile nodes against fixed responder nodes.
 package orca
 
-import "database/sql"
+import (
+	"database/sql"
+	"log"
+)
 
 // Version specifies the current version of the Orca library.
 const Version = "0.1"
@@ -13,6 +16,7 @@ const Version = "0.1"
 type App struct {
 	Config     *Config        // The configuration loaded from the YAML file
 	GeoIP      *MaxMindClient // GeoIP Lookup API client
+	Device     *Device        // Descriptor for the device in the database
 	Location   *Location      // Current location of the application
 	ExternalIP string         // Current external IP address of the machine
 	db         *sql.DB        // Connection to the database stored on the app
@@ -38,6 +42,32 @@ func Init() (*App, error) {
 	)
 
 	return app, nil
+}
+
+// GetDevice returns the device on the app, if it is nil, it performs a
+// database query for the device based on the Config name; if there is nothing
+// in the database, it inserts the record from the configuration.
+func (app *App) GetDevice() *Device {
+
+	if app.Device == nil {
+		// Allocate a new device
+		app.Device = new(Device)
+
+		// Attempt to fetch device info from database by name
+		if err := app.Device.GetByName(app.Config.Name, app.db); err != nil {
+			// If no record is in the database, populate and save!
+			app.Device.Name = app.Config.Name
+			app.Device.IPAddr, _ = app.GetListenAddr()
+			app.Device.Domain = app.Config.Domain
+
+			// Save the device to the database, if that's not possible, die.
+			if _, err := app.Device.Save(app.db); err != nil {
+				log.Fatal(err)
+			}
+		}
+	}
+
+	return app.Device
 }
 
 // SyncLocation checks the external IP address against the current IP address,

@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"time"
+
+	"github.com/bbengfort/orca/echo"
 )
 
 /////////////////////////////////////////////////////////////////////////////
@@ -29,11 +31,16 @@ type ModelMeta struct {
 // Device is an entity that represents nodes in the network that can be pinged.
 // Device objects are stored in the devices table.
 type Device struct {
-	Name   string // Hostname of the device
-	IPAddr string // IP Address of the device
-	Domain string // Domain name of the device
+	Name     string       // Hostname of the device
+	IPAddr   string       // IP Address of the device
+	Domain   string       // Domain name of the device
+	Sequence int64        // The response/reply counter for a device
+	echo     *echo.Device // The protocol buffer representation
 	ModelMeta
 }
+
+// Devices is a collection of Device objects loaded from the database.
+type Devices []Device
 
 // Location is a geographic record that is usually associated with an IP
 // address via the geoip lookup service but could also come from GPS.
@@ -49,6 +56,12 @@ type Location struct {
 	ModelMeta
 }
 
+// Ping is a timeseries record of latency requests reflected from echo servers.
+type Ping struct {
+	ID int64 //  Unique ID of the record
+
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Device Methods
 /////////////////////////////////////////////////////////////////////////////
@@ -56,8 +69,16 @@ type Location struct {
 // Get a device from the database by ID and populate the struct fields.
 func (d *Device) Get(id int64, db *sql.DB) error {
 	row := db.QueryRow("SELECT * FROM devices WHERE id = $1", id)
-	err := row.Scan(&d.ID, &d.Name, &d.IPAddr, &d.Domain, &d.Created, &d.Updated)
+	err := row.Scan(&d.ID, &d.Name, &d.IPAddr, &d.Domain, &d.Sequence, &d.Created, &d.Updated)
 
+	return err
+}
+
+// GetByName a device from the database and populate the struct fields.
+func (d *Device) GetByName(name string, db *sql.DB) error {
+
+	row := db.QueryRow("SELECT * FROM devices WHERE name = $1", name)
+	err := row.Scan(&d.ID, &d.Name, &d.IPAddr, &d.Domain, &d.Sequence, &d.Created, &d.Updated)
 	return err
 }
 
@@ -72,8 +93,8 @@ func (d *Device) Save(db *sql.DB) (bool, error) {
 		d.Updated = time.Now()
 
 		// Execute the query against the database
-		query := "UPDATE devices SET name=$1, ipaddr=$2, domain=$3, updated=$4 WHERE id = $6"
-		_, err := db.Exec(query, d.Name, d.IPAddr, d.Domain, d.Updated, d.ID)
+		query := "UPDATE devices SET name=$1, ipaddr=$2, domain=$3, sequence=$4, updated=$5 WHERE id = $6"
+		_, err := db.Exec(query, d.Name, d.IPAddr, d.Domain, d.Sequence, d.Updated, d.ID)
 
 		return false, err
 	}
@@ -84,11 +105,11 @@ func (d *Device) Save(db *sql.DB) (bool, error) {
 	d.Updated = time.Now()
 
 	// Create the query to insert the device into the database
-	query := "INSERT INTO devices (name, ipaddr, domain, created, updated) VALUES ($1, $2, $3, $4, $5)"
+	query := "INSERT INTO devices (name, ipaddr, domain, sequence, created, updated) VALUES ($1, $2, $3, $4, $5, $6)"
 	query += "; SELECT last_insert_rowid() FROM locations"
 
 	// Execute the INSERT query against the dtabase
-	res, err := db.Exec(query, d.Name, d.IPAddr, d.Domain, d.Created, d.Updated)
+	res, err := db.Exec(query, d.Name, d.IPAddr, d.Domain, d.Sequence, d.Created, d.Updated)
 	if err != nil {
 		return false, err
 	}
@@ -118,21 +139,38 @@ func (d *Device) Exists(id int64, db *sql.DB) (bool, error) {
 	return existsInDatabase(db, "devices", id)
 }
 
+// Echo converts a device to an echo.Device protocol buffer message.
+func (d *Device) Echo() *echo.Device {
+	if d.echo == nil {
+		d.echo = new(echo.Device)
+		d.echo.Name = d.Name
+		d.echo.IPAddr = d.IPAddr
+		d.echo.Domain = d.Domain
+	}
+
+	return d.echo
+}
+
+// String returns the textual string representation of the device
+func (d *Device) String() string {
+	output := "%s (%s)"
+
+	var addr string
+	switch {
+	case d.Domain != "":
+		addr = d.Domain
+	case d.IPAddr != "":
+		addr = d.IPAddr
+	default:
+		addr = "Unknown Address"
+	}
+
+	return fmt.Sprintf(output, d.Name, addr)
+}
+
 /////////////////////////////////////////////////////////////////////////////
 // Location Methods
 /////////////////////////////////////////////////////////////////////////////
-
-// String returns a pretty representation of the location
-func (loc *Location) String() string {
-	output := fmt.Sprintf("%s is located at %s, %s (%f, %f)", loc.IPAddr, loc.City, loc.Country, loc.Latitude, loc.Longitude)
-	if loc.Organization != "" {
-		output += fmt.Sprintf("\nOrganization: %s", loc.Organization)
-		if loc.Domain != "" {
-			output += fmt.Sprintf(" (%s)", loc.Domain)
-		}
-	}
-	return output
-}
 
 // Get a location from the database by ID and populate the struct fields.
 func (loc *Location) Get(id int64, db *sql.DB) error {
@@ -211,6 +249,18 @@ func (loc *Location) IPExists(db *sql.DB) error {
 	err := row.Scan(&loc.ID)
 
 	return err
+}
+
+// String returns a pretty representation of the location
+func (loc *Location) String() string {
+	output := fmt.Sprintf("%s is located at %s, %s (%f, %f)", loc.IPAddr, loc.City, loc.Country, loc.Latitude, loc.Longitude)
+	if loc.Organization != "" {
+		output += fmt.Sprintf("\nOrganization: %s", loc.Organization)
+		if loc.Domain != "" {
+			output += fmt.Sprintf(" (%s)", loc.Domain)
+		}
+	}
+	return output
 }
 
 /////////////////////////////////////////////////////////////////////////////

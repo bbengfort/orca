@@ -1,7 +1,7 @@
 package orca
 
 import (
-	"fmt"
+	"log"
 	"time"
 
 	"github.com/bbengfort/orca/echo"
@@ -22,17 +22,22 @@ func (app *App) Generate() error {
 		IPAddr: addr,
 	}
 
-	reply, err := Ping(device)
+	// Send the ping out and get a reply (blocking)
+	reply, err := app.Ping(device)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println(reply)
+	// Log the echo reply
+	if app.Config.Debug {
+		log.Println(reply.LogRecord())
+	}
+
 	return nil
 }
 
 // Ping sends an echo request to another device
-func Ping(device *Device) (*echo.Reply, error) {
+func (app *App) Ping(device *Device) (*echo.Reply, error) {
 
 	// Connect to the remote node
 	conn, err := grpc.Dial(device.IPAddr, grpc.WithInsecure(), grpc.WithTimeout(Timeout))
@@ -47,9 +52,9 @@ func Ping(device *Device) (*echo.Reply, error) {
 	// Create an EchoRequest to send to the node
 	request := &echo.Request{
 		Sequence: 1,
-		Sender:   nil,
+		Sender:   app.GetDevice().Echo(),
 		Sent:     &echo.Time{Nanoseconds: time.Now().UnixNano()},
-		TTL:      30,
+		TTL:      int64(Timeout.Seconds()),
 		Payload:  []byte("Clutter to be replaced with random or actual data."),
 	}
 

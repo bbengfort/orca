@@ -66,9 +66,38 @@ func main() {
 				},
 			},
 		},
+		{
+			Name:   "devices",
+			Usage:  "manage the list of remote devices",
+			Action: manageDevices,
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "a, add",
+					Usage: "interactivly add a device",
+				},
+				cli.BoolFlag{
+					Name:  "l, list",
+					Usage: "list the devices in the database",
+				},
+			},
+		},
+		{
+			Name:   "test",
+			Usage:  "debugging test functionality",
+			Action: test,
+		},
 	}
 
 	app.Run(os.Args)
+}
+
+func readInput(prompt string, orig string) string {
+	var input string
+
+	fmt.Print(fmt.Sprintf("%s [%s]: ", prompt, orig))
+	fmt.Scanln(&input)
+
+	return input
 }
 
 func initOrca(c *cli.Context) error {
@@ -120,7 +149,10 @@ func printConfig(c *cli.Context) error {
 		}
 
 		// Print the current location and IP Address
-		fmt.Printf("Current IP Adress: %s\nCurrent Location: %s\n", orcaApp.ExternalIP, orcaApp.Location.String())
+		fmt.Printf(
+			"Current IP Adress: %s\nCurrent Location: %s\n",
+			orcaApp.ExternalIP, orcaApp.Location.String(),
+		)
 	}
 
 	return nil
@@ -154,5 +186,51 @@ func createDatabase(c *cli.Context) error {
 	}
 
 	fmt.Printf("Created Orca DB at %s\n", path)
+	return nil
+}
+
+func manageDevices(c *cli.Context) error {
+
+	// Return the list of devices if specified
+	if c.Bool("list") {
+		devices, err := orcaApp.FetchDevices()
+		if err != nil {
+			return cli.NewExitError(err.Error(), 5)
+		}
+
+		for i, d := range devices {
+			fmt.Printf("%d. %s seq=%d\n", i+1, d.String(), d.Sequence)
+		}
+
+		return nil
+	}
+
+	// Interactively add a device to the database
+	if c.Bool("add") {
+
+		// Create the new empty device
+		device := new(orca.Device)
+
+		// Get the name from the command line
+		device.Name = readInput("Enter device name", "")
+
+		// Fetch the ID by name if it exists, otherwise ignore
+		device.GetByName(device.Name, orcaApp.GetDB())
+
+		// Get the final information for the device
+		device.IPAddr = readInput("Enter device IP address", device.IPAddr)
+		device.Domain = readInput("Enter device domain", device.Domain)
+
+		if _, err := device.Save(orcaApp.GetDB()); err != nil {
+			return cli.NewExitError(err.Error(), 5)
+		}
+
+		return nil
+	}
+
+	return cli.NewExitError("Specify a device management command", 1)
+}
+
+func test(c *cli.Context) error {
 	return nil
 }

@@ -29,6 +29,7 @@ CREATE TABLE "devices"
     "name" TEXT NOT NULL UNIQUE,
     "ipaddr" TEXT,
     "domain" TEXT,
+    "sequence" INTEGER DEFAULT 0,
     "created" DATETIME,
     "updated" DATETIME
 );
