@@ -96,13 +96,13 @@ $ orca generate
 
 Similar to the reflector, you'll have to nohup and background this in order to ensure it always runs. LaunchAgent and Upstart scripts are coming soon. The generator waits until the interval has passed, loads up the list of devices to ping, and sends an echo request to them, recording the request (in the case of non-connectivity) and sequence number in the database. On receipt of the reply, it measures latency and stores the information in the database.
 
-## Location Services
+## Location Servicesd
 
-Orca can provide location services for mobile devices via the [MaxMind GeoIP2 Precision City Service](https://www.maxmind.com/en/geoip2-precision-city-service). In order to enable location services, you need to register for a MaxMind developer account and include your API user id and license key in the YAML configuration file. Because MaxMind is a paid service, location lookups are only made when the current IP address of the machine changes. 
+Orca can provide location services for mobile devices via the [MaxMind GeoIP2 Precision City Service](https://www.maxmind.com/en/geoip2-precision-city-service). In order to enable location services, you need to register for a MaxMind developer account and include your API user id and license key in the YAML configuration file. Because MaxMind is a paid service, location lookups are only made when the current IP address of the machine changes.
 
 Note also that the granularity for this service is limited; for example, a GeoIP2 lookup from my office in the A.V. Williams Building of the University of Maryland yielded the following location via latitude and longitude:
 
-<iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d12406.06542394053!2d-76.94564366524104!3d38.98071020327948!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzjCsDU4JzUwLjUiTiA3NsKwNTYnMTIuOCJX!5e0!3m2!1sen!2sus!4v1477057731514" width="888" height="400" frameborder="0" style="border:0" allowfullscreen></iframe>
+![Map Granularity](fixtures/map.png)
 
 This location is not centered on my office, the building, or even in the center of the university. The level of granularity probably differs based on the type of network you're connected to. If a higher level of granularity is required, then the use of GPS is recommended. Additional location inaccuracy can come about when tethering to a mobile phone. Use specified locations with care!
 
