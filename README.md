@@ -96,7 +96,36 @@ $ orca generate
 
 Similar to the reflector, you'll have to nohup and background this in order to ensure it always runs. LaunchAgent and Upstart scripts are coming soon. The generator waits until the interval has passed, loads up the list of devices to ping, and sends an echo request to them, recording the request (in the case of non-connectivity) and sequence number in the database. On receipt of the reply, it measures latency and stores the information in the database.
 
-## Location Servicesd
+## Running Agents
+
+Orca is a long running process that conducts work on a routine interval. As a result, you'll want to run orca as an *agent* - a background daemon that runs on behalf of a user. Running an agent depends on the operating system environment, in this section we will present agent scripts for `launchd` on OS X and Upstart on Ubuntu.
+
+### Launch Agent
+
+Orca is designed to be [launchd](https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html) compliant to run as a user agent in the background and be started by the operating system. In order to configure Orca to be run in the background, a property list describing the agent needs to be installed to the Library and the binary must have a file mode that is not group or world writable.
+
+```
+$ chmod 600 /usr/local/bin/orca
+$ cp fixtures/com.bengfort.orca.plist ~/Library/LaunchAgents
+$ chmod 600 ~/Library/LaunchAgents/com.bengfort.orca.plist
+$ launchctl load ~/Library/LaunchAgents/com.bengfort.orca.plist
+```
+
+Note that this assumes that you've placed the executable onto your path at `/usr/local/bin` (modify the path as needed) and that you've cloned the Orca repository. The plist file that describes the LaunchAgent sits in the fixtures directory in the root of the Orca repository.
+
+### Upstart
+
+The Orca reflector is designed to be run on an Ubuntu Linux server and therefore has an Upstart script that will make sure it is loaded and always running. The Upstart configuration is in the fixtures directory of the repository. Install as follows
+
+```
+$ sudo cp fixtures/orca.conf /etc/init/orca.conf
+$ sudo chown root:root /etc/init/orca.conf
+$ sudo service orca start
+```
+
+This should run the orca reflector service and keep it alive even when the server reboots.
+
+## Location Services
 
 Orca can provide location services for mobile devices via the [MaxMind GeoIP2 Precision City Service](https://www.maxmind.com/en/geoip2-precision-city-service). In order to enable location services, you need to register for a MaxMind developer account and include your API user id and license key in the YAML configuration file. Because MaxMind is a paid service, location lookups are only made when the current IP address of the machine changes.
 
