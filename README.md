@@ -105,10 +105,11 @@ Orca is a long running process that conducts work on a routine interval. As a re
 Orca is designed to be [launchd](https://developer.apple.com/library/content/documentation/MacOSX/Conceptual/BPSystemStartup/Chapters/CreatingLaunchdJobs.html) compliant to run as a user agent in the background and be started by the operating system. In order to configure Orca to be run in the background, a property list describing the agent needs to be installed to the Library and the binary must have a file mode that is not group or world writable.
 
 ```
-$ chmod 600 /usr/local/bin/orca
+$ chmod 700 /usr/local/bin/orca
 $ cp fixtures/com.bengfort.orca.plist ~/Library/LaunchAgents
 $ chmod 600 ~/Library/LaunchAgents/com.bengfort.orca.plist
 $ launchctl load ~/Library/LaunchAgents/com.bengfort.orca.plist
+$ launchctl start com.bengfort.orca
 ```
 
 Note that this assumes that you've placed the executable onto your path at `/usr/local/bin` (modify the path as needed) and that you've cloned the Orca repository. The plist file that describes the LaunchAgent sits in the fixtures directory in the root of the Orca repository.
