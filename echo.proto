@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package orca;
+
+// Time preserves nanosecond latency measurements by using a custom time
+// struct which should include either seconds or nanoseconds since the Unix
+// epoch as unsigned int64. In Go, use time.Unix to parse this field.
+message Time {
+    int64 seconds = 1;
+    int64 nanoseconds = 2;
+}
+
+// Location describes the results of an GeoIP query
+message Location {
+    string ipaddr = 1;
+    double latitude = 2;
+    double longitude = 3;
+    string city = 4;
+    string postal = 5;
+    string country = 6;
+    string organization = 7;
+    string domain = 8;
+}
+
+// Device describes an sender or a receiver on the network.
+message Device {
+    string name = 1;
+    string ipaddr = 2;
+    string domain = 3;
+    Location location = 4;
+}
+
+// Request is used to measure latency and uptime.
+message Request {
+    int64 sequence = 1;
+    Device sender = 2;
+    Time sent = 3;
+    int64 ttl = 4;
+    int64 ping = 5;
+    bytes payload = 15;
+}
+
+// Reply is used to respond to EchoRequest messages.
+message Reply {
+    int64 sequence = 1;
+    Device receiver = 2;
+    Time received = 3;
+    Request echo = 4;
+}
+
+
+// Orca is the service definition for nodes.
+service Orca {
+
+    // Reflect allows nodes to respond to echo requests with echo replies.
+    rpc Echo (Request) returns (Reply) {}
+
+}

@@ -1,16 +1,19 @@
 {
 	"ImportPath": "github.com/bbengfort/orca",
-	"GoVersion": "go1.6",
+	"GoVersion": "go1.7",
 	"GodepVersion": "v65",
+	"Packages": [
+		"./..."
+	],
 	"Deps": [
 		{
 			"ImportPath": "github.com/golang/protobuf/proto",
 			"Rev": "e51d002c610dbe8c136679a67a6ded5df4d49b5c"
 		},
 		{
-			"ImportPath": "github.com/mattn/go-sqlite3",
-			"Comment": "v1.1.0-96-ge5a3c16",
-			"Rev": "e5a3c16c5c1d80b24f633e68aecd6b0702786d3d"
+			"ImportPath": "github.com/joho/godotenv",
+			"Comment": "v1-10-g4ed1339",
+			"Rev": "4ed13390c0acd2ff4e371e64d8b97c8954138243"
 		},
 		{
 			"ImportPath": "github.com/onsi/ginkgo",
@@ -148,6 +151,11 @@
 			"Rev": "815512bce8c889153a13104c9d9b2416153c1e02"
 		},
 		{
+			"ImportPath": "github.com/urfave/cli",
+			"Comment": "v1.18.0-69-g55f715e",
+			"Rev": "55f715e28c46073d0e217e2ce8eb46b0b45e3db6"
+		},
+		{
 			"ImportPath": "golang.org/x/net/context",
 			"Rev": "0c607074acd38c5f23d1344dfe74c977464d1257"
 		},
@@ -206,10 +214,6 @@
 		{
 			"ImportPath": "google.golang.org/grpc/transport",
 			"Rev": "b0b7afa173ab8030774fdf383cac027c3c5077d2"
-		},
-		{
-			"ImportPath": "gopkg.in/yaml.v2",
-			"Rev": "a5b47d31c556af34a302ce5d659e6fea44d90de0"
 		}
 	]
 }
