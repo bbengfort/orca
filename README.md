@@ -114,6 +114,14 @@ $ launchctl start com.bengfort.orca
 
 Note that this assumes that you've placed the executable onto your path at `/usr/local/bin` (modify the path as needed) and that you've cloned the Orca repository. The plist file that describes the LaunchAgent sits in the fixtures directory in the root of the Orca repository.
 
+In order to stop the agent (`launchd` will restart it if it crashes) you must use the `launchctl remove` command as follows:
+
+```
+$ launchctl remove com.bengfort.orca
+```
+
+Then to restart it you need to load the plist as described above.
+
 ### Upstart
 
 The Orca reflector is designed to be run on an Ubuntu Linux server and therefore has an Upstart script that will make sure it is loaded and always running. The Upstart configuration is in the fixtures directory of the repository. Install as follows
