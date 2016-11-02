@@ -15,11 +15,13 @@ const Interval = time.Duration(1) * time.Second
 // Timeout is the amount of time sonar will wait for a reply
 const Timeout = time.Duration(30) * time.Second
 
+var sequence int64
+
 // Generate is long running function that initializes pings then sleeps.
-func (app *App) Generate(addr string) error {
+func (app *App) Generate(addr string, count int) error {
 
 	// Loop forever with a delay between the interval
-	for {
+	for i := 0; i < count; i++ {
 
 		// Wait for the specified interval
 		select {
@@ -34,6 +36,9 @@ func (app *App) Generate(addr string) error {
 
 	}
 
+	// Compute the statistics
+	app.ComputeStats()
+	return nil
 }
 
 // Ping sends an echo request to a device and handles the response
@@ -76,13 +81,15 @@ func (app *App) SendPing(addr string) (*Reply, error) {
 	defer conn.Close()
 	client := NewOrcaClient(conn)
 
+	sequence++
+
 	// Create an EchoRequest to send to the node
 	request := &Request{
-		Sequence: 0,
-		Sender:   nil,
+		Sequence: sequence,
+		Sender:   &Device{Name: "orca", IPAddr: app.IPAddr},
 		Sent:     &Time{Nanoseconds: time.Now().UnixNano()},
 		TTL:      int64(Timeout.Seconds()),
-		Ping:     0,
+		Ping:     sequence,
 		Payload:  []byte("Clutter to be replaced with random or actual data."),
 	}
 

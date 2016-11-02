@@ -9,6 +9,8 @@ import (
 	"google.golang.org/grpc"
 )
 
+var responses int64
+
 // Echo implements the echo.EchoServer interface on the App
 func (app *App) Echo(ctx context.Context, in *Request) (*Reply, error) {
 
@@ -20,10 +22,12 @@ func (app *App) Echo(ctx context.Context, in *Request) (*Reply, error) {
 		log.Println(in.LogRecord())
 	}
 
+	responses++
+
 	// Return the Reply
 	return &Reply{
-		Sequence: 0,
-		Receiver: nil,
+		Sequence: responses,
+		Receiver: &Device{Name: "orca", IPAddr: app.IPAddr},
 		Received: &Time{Nanoseconds: recv.UnixNano()},
 		Echo:     in,
 	}, nil

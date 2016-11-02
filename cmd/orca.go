@@ -25,20 +25,38 @@ func main() {
 	app.Email = "bengfort@cs.umd.edu"
 	app.Commands = []cli.Command{
 		{
-			Name:   "listen",
-			Usage:  "listen for pings",
-			Action: listen,
+			Name:      "listen",
+			Usage:     "listen for pings",
+			Action:    listen,
+			ArgsUsage: " ",
 			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "s, silent",
+					Usage: "do not log messages",
+				},
 				cli.StringFlag{
 					Name:  "a, addr",
 					Usage: "specify the address to listen on",
+					Value: ":3265",
 				},
 			},
 		},
 		{
-			Name:   "ping",
-			Usage:  "send echo requests to the specified address",
-			Action: ping,
+			Name:      "ping",
+			Usage:     "send echo requests to the specified address",
+			Action:    ping,
+			ArgsUsage: "ipaddr",
+			Flags: []cli.Flag{
+				cli.BoolFlag{
+					Name:  "s, silent",
+					Usage: "do not log messages",
+				},
+				cli.IntFlag{
+					Name:  "n, num",
+					Usage: "limit the number of echo requests",
+					Value: 4,
+				},
+			},
 		},
 	}
 
@@ -47,7 +65,11 @@ func main() {
 
 func listen(c *cli.Context) error {
 
-	orcaApp, err := orca.Init(false)
+	// Get the arguments from the command line
+	silent := c.Bool("silent")
+	addr := c.String("addr")
+
+	orcaApp, err := orca.Init(silent, addr)
 	if err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
@@ -61,18 +83,23 @@ func listen(c *cli.Context) error {
 
 func ping(c *cli.Context) error {
 
-	orcaApp, err := orca.Init(false)
-	if err != nil {
-		return cli.NewExitError(err.Error(), 1)
-	}
-
+	// Validate arguments
 	if c.NArg() != 1 {
 		return cli.NewExitError("Specify an IP address to ping", 1)
 	}
 
+	// Get the arguments from the command line
+	silent := c.Bool("silent")
+	count := c.Int("num")
 	addr := c.Args()[0]
 
-	if err := orcaApp.Generate(addr); err != nil {
+	// Initialize the app
+	orcaApp, err := orca.Init(silent, "")
+	if err != nil {
+		return cli.NewExitError(err.Error(), 1)
+	}
+
+	if err := orcaApp.Generate(addr, count); err != nil {
 		return cli.NewExitError(err.Error(), 1)
 	}
 

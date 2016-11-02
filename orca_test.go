@@ -10,7 +10,7 @@ import (
 var _ = Describe("Orca", func() {
 
 	It("should be at version 0.1", func() {
-		Ω(Version).Should(Equal("0.1"))
+		Ω(Version).Should(Equal("ping"))
 	})
 
 })
